@@ -23,6 +23,22 @@ app.get('/produtos', (req, res) => {
     res.json(produtos)
 })
 
+//:id é um parâmetro da URL
+app.delete("/produtos/:id", (req, res) => {
+  let id = req.params.id
+  //busca o produto no vetor para excluir
+  for(let contador = 0; contador <= produtos.length - 1; contador++){
+    let produto = produtos[contador]
+    if (produto.id == id){ //se encontrou o produto buscado
+      produtos.splice(contador, 1) //remove o elemento do vetor
+      break
+    }
+  }
+  res.json({
+    success: true
+  })
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
