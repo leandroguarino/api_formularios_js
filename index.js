@@ -39,6 +39,26 @@ app.delete("/produtos/:id", (req, res) => {
   })
 })
 
+app.put('/produtos/:id', (req, res) => {
+  let idAlterado = req.params.id
+  let nome = req.body.nome
+  let preco = req.body.preco
+  let descricao = req.body.descricao
+  //procura o produto no vetor e altera-o
+  for(let contador = 0; contador <= produtos.length - 1; contador++){
+    let produto = produtos[contador]
+    if (produto.id == idAlterado){
+      produto.nome = nome
+      produto.preco = preco
+      produto.descricao = descricao
+      break //depois de alterar o produto, nao precisa buscar
+    }
+  }
+  res.json({
+    success: true
+  })
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
