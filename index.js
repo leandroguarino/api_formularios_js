@@ -5,11 +5,59 @@ const port = 3000
 app.use(cors())
 app.use(express.json()) //ensina o back a ler json
 
+let pedidos = [] //banco de dados fake de pedidos
+
 let produtos = [
     { id: 1, nome: 'Produto 1', preco: 10.00, descricao: 'Descrição do Produto 1' },
     { id: 2, nome: 'Produto 2', preco: 20.00, descricao: 'Descrição do Produto 2' },
     { id: 3, nome: 'Produto 3', preco: 30.00, descricao: 'Descrição do Produto 3' }
 ]
+
+function getProximoId() {
+  if (pedidos.length > 0){
+    //pega o último produto do vetor
+    let ultimoPedido = pedidos[pedidos.length - 1]
+    //pega o id do último produto do vetor
+    let maxId = ultimoPedido.id
+    return maxId+1
+  }else{
+    return 1 //quando não há nenhum produto, retorna 1, o primeiro ID
+  }
+}
+
+function buscarProduto(idProduto){
+  for(let contador=0; contador < produtos.length; contador++){
+    let produto = produtos[contador]
+    if (produto.id == idProduto){
+      return produto //retorna o objeto encontrado no banco de dados fake
+    }
+  }
+  return null //se não encontrar o ID, retorna null
+}
+
+app.post('/pedidos', (req, res) => {
+  let novoPedido = req.body
+  novoPedido.id = getProximoId()
+  novoPedido.dataHora = new Date()
+
+  //passa pelos itens do pedido "transformando" o ID do produto em Objeto
+  for(let contador = 0; contador < novoPedido.itens.length; contador++){
+    let item = novoPedido.itens[contador]
+    let idProduto = item.produto
+    let objetoProduto = buscarProduto(idProduto) //"transforma" o ID em Objeto
+    //altera a propriedade produto do item para o objeto
+    novoPedido.itens[contador].produto = objetoProduto
+  }
+  
+  pedidos.push(novoPedido)
+  res.json({
+    success: true
+  })
+})
+
+app.get("/pedidos", (req, res) => {
+  res.json(pedidos)
+})
 
 app.post('/produtos', (req, res) => {
   let novoProduto = req.body
